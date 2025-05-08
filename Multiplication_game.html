@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multiplication Game</title>
+  <link rel="icon" href="D:\Square_cube\Multiplication_game\uncertainty.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f0f4f8, #d9e8fc);
+      margin: 0;
+      padding: 0;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      transition: background 0.4s, color 0.4s;
+    }
+    .dark-mode {
+      background: linear-gradient(135deg, #0f172a, #1a1a1a);
+      color: #f1f1f1;
+    }
+    .dark-mode #summary {
+      background: #1e293b;
+      color: #f1f1f1;
+    }
+    h1 {
+      margin-top: 30px;
+      font-size: 2.8rem;
+      color: #007bff;
+      animation: fadeIn 1s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    #timer {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+      animation: fadeIn 1s ease-in-out 0.3s both;
+    }
+    .controls button,
+    .controls select,
+    .controls label {
+      position: relative;
+      padding: 10px 16px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .controls button:hover,
+    .controls select:hover,
+    .controls label:hover {
+      background-color: #0056b3;
+      transform: scale(1.05);
+    }
+    .controls select,
+    .controls label {
+      background-color: #f8f9fa;
+      color: #333;
+      border: 1px solid #ccc;
+    }
+    .controls button[title]::after,
+    .controls select[title]::after,
+    .controls label[title]::after {
+      content: attr(title);
+      position: absolute;
+      bottom: 120%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 10;
+    }
+    
+    #question {
+      font-size: 2rem;
+      margin: 20px 0;
+      font-weight: 600;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    #answer {
+      font-size: 1.5rem;
+      padding: 12px;
+      border-radius: 10px;
+      border: 2px solid #ccc;
+      width: 200px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .green {
+      border-color: #28a745 !important;
+      background-color: #d4edda !important;
+    }
+    .red {
+      border-color: #dc3545 !important;
+      background-color: #f8d7da !important;
+    }
+    #summary {
+      margin-top: 30px;
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 420px;
+      width: 90%;
+      animation: fadeIn 1s ease-in-out;
+    }
+    .correct-answer-display {
+      font-size: 1rem;
+      color: #dc3545;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    footer {
+      margin-top: auto;
+      padding: 15px 0;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #888;
+    }
+    .dark-mode footer {
+      color: #aaa;
+    }
+    @media (max-width: 600px) {
+      .controls {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Multiplication Game</h1>
+  <div id="timer">Time: 0m 0s</div>
+
+  <div class="controls">
+    <button onclick="startGame()" title="Shortcut: S">Start</button>
+    <button onclick="stopGame()" title="Shortcut: A">Stop</button>
+    <select id="difficulty" title="Shortcut: L">
+      <option value="2x2">2 x 2</option>
+      <option value="3x2">3 x 2</option>
+      <option value="3x3">3 x 3</option>
+      <option value="random">Random</option>
+    </select>
+    <button onclick="toggleDarkMode()" title="Shortcut: D">Dark Mode</button>
+    <label title="Shortcut: M"><input type="checkbox" id="soundToggle" checked onchange="toggleSound()" /> Sound</label>
+    <button onclick="toggleFullscreen()" title="Shortcut: F">Fullscreen</button>
+  </div>
+
+  <div id="question"></div>
+  <input type="number" id="answer" placeholder="Type answer..." oninput="handleInput(event)" />
+  <div id="correct-answer" class="correct-answer-display"></div>
+  <div id="summary"></div>
+
+  <audio id="correctSound" src="D:\Square_cube\Multiplication_game\correct-choice.mp3""></audio>
+  <audio id="wrongSound" src="D:\Square_cube\Multiplication_game\wrong-answer.wav""></audio>
+
+  <footer>
+    &copy; 2025 Multiplication Game. All rights reserved.
+	<p>ramit-kumar-edition</p>
+  </footer>
+
+  <script>
+    let gameInterval;
+    let timerInterval;
+    let questions = [];
+    let current = 0;
+    let score = 0;
+    let correct = 0;
+    let wrong = 0;
+    let startTime;
+    let soundOn = true;
+	let isFullScreen = false;
+
+    const difficultyLevels = {
+      '2x2': [2, 2],
+      '3x2': [3, 2],
+      '3x3': [3, 3],
+    };
+
+    const randomLevels = [
+      [2, 2],
+      [3, 2],
+      [3, 3]
+    ];
+
+    function generateNumber(digits) {
+      const min = Math.pow(10, digits - 1);
+      const max = Math.pow(10, digits) - 1;
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function generateQuestions(level) {
+      return Array.from({ length: 10 }, () => {
+        let digitsA, digitsB;
+        if (level === "random") {
+          [digitsA, digitsB] = randomLevels[Math.floor(Math.random() * randomLevels.length)];
+        } else {
+          [digitsA, digitsB] = difficultyLevels[level];
+        }
+        const x = generateNumber(digitsA);
+        const y = generateNumber(digitsB);
+        return { x, y, answer: x * y };
+      });
+    }
+
+    function startGame() {
+      const level = document.getElementById("difficulty").value;
+      questions = generateQuestions(level);
+      current = 0;
+      score = 0;
+      correct = 0;
+      wrong = 0;
+      document.getElementById("summary").innerHTML = "";
+      document.getElementById("correct-answer").textContent = "";
+      startTime = Date.now();
+      updateTimer();
+      clearInterval(timerInterval);
+      timerInterval = setInterval(updateTimer, 1000);
+      nextQuestion();
+    }
+
+    function updateTimer() {
+      const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+      const minutes = Math.floor(elapsedSeconds / 60);
+      const seconds = elapsedSeconds % 60;
+      document.getElementById("timer").textContent = `Time: ${minutes}m ${seconds}s`;
+    }
+
+    function stopGame() {
+      clearTimeout(gameInterval);
+      clearInterval(timerInterval);
+      showSummary();
+    }
+
+    function nextQuestion() {
+      if (current >= questions.length) {
+        stopGame();
+        return;
+      }
+      const q = questions[current];
+      const questionEl = document.getElementById("question");
+      const answerEl = document.getElementById("answer");
+      document.getElementById("correct-answer").textContent = "";
+      questionEl.textContent = `${q.x} × ${q.y} = ?`;
+      answerEl.value = "";
+      answerEl.className = "";
+      answerEl.focus();
+    }
+
+    function handleInput(event) {
+      const value = event.target.value;
+      const q = questions[current];
+      if (value.length === q.answer.toString().length) {
+        checkAnswer(value);
+      }
+    }
+
+    function checkAnswer(value) {
+      if (value === "") return;
+      const userAnswer = parseInt(value);
+      const q = questions[current];
+      const answerEl = document.getElementById("answer");
+      const correctAnswerEl = document.getElementById("correct-answer");
+
+      if (userAnswer === q.answer) {
+        score += 4;
+        correct++;
+        answerEl.className = "green";
+        if (soundOn) document.getElementById("correctSound").play();
+        gameInterval = setTimeout(() => {
+          current++;
+          nextQuestion();
+        }, 1000);
+      } else {
+        score -= 1;
+        wrong++;
+        answerEl.className = "red";
+        correctAnswerEl.textContent = `Correct answer: ${q.answer}`;
+        if (soundOn) document.getElementById("wrongSound").play();
+        gameInterval = setTimeout(() => {
+          current++;
+          nextQuestion();
+        }, 1000);
+      }
+    }
+
+    function showSummary() {
+      const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+      const minutes = Math.floor(elapsedSeconds / 60);
+      const seconds = elapsedSeconds % 60;
+      const accuracy = ((correct / (correct + wrong || 1)) * 100).toFixed(1);
+      document.getElementById("summary").innerHTML = `
+        <h2>Game Summary</h2>
+        <p>✅ Correct: ${correct}</p>
+        <p>❌ Wrong: ${wrong}</p>
+        <p>🎯 Accuracy: ${accuracy}%</p>
+        <p>⏱ Time: ${minutes}m ${seconds}s</p>
+        <p>🏆 Score: ${score}</p>
+      `;
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+    }
+
+    function toggleSound() {
+      soundOn = document.getElementById("soundToggle").checked;
+    }
+
+     function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+        isFullScreen = true;
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+          isFullScreen = false;
+        }
+      }
+    }
+	document.addEventListener("keydown", function(e) {
+      switch (e.key.toLowerCase()) {
+        case 's': startGame(); break;
+        case 'a': stopGame(); break;
+        case 'd': toggleDarkMode(); break;
+        case 'l': document.getElementById('difficulty').focus(); break;
+        case 'm': 
+          const soundToggle = document.getElementById('soundToggle');
+          soundToggle.checked = !soundToggle.checked;
+          toggleSound();
+          break;
+        case 'f': toggleFullscreen(); break;
+      }
+    });
+  </script>
+</body>
+</html>
