@@ -145,6 +145,20 @@
       font-weight: bold;
       margin-top: 10px;
     }
+    #progress-bar-container {
+      width: 100%;
+      max-width: 400px;
+      background-color: #e0e0e0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 10px auto 20px;
+    }
+    #progress-bar {
+      height: 16px;
+      background-color: #007bff;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
     footer {
       margin-top: auto;
       padding: 15px 0;
@@ -183,6 +197,7 @@
 <body>
   <h1>Multiplication Game</h1>
   <div id="timer">Time: 0m 0s</div>
+  <div id="progress-bar-container"><div id="progress-bar"></div></div>
 
   <div class="controls">
     <button onclick="startGame()" title="Shortcut: S">Start</button>
@@ -255,6 +270,11 @@
       });
     }
 
+    function updateProgressBar() {
+      const percent = ((current / questions.length) * 100).toFixed(0);
+      document.getElementById("progress-bar").style.width = `${percent}%`;
+    }
+
     function startGame() {
       const level = document.getElementById("difficulty").value;
       questions = generateQuestions(level);
@@ -264,6 +284,7 @@
       wrong = 0;
       document.getElementById("summary").innerHTML = "";
       document.getElementById("correct-answer").textContent = "";
+      updateProgressBar();
       startTime = Date.now();
       updateTimer();
       clearInterval(timerInterval);
@@ -281,6 +302,8 @@
     function stopGame() {
       clearTimeout(gameInterval);
       clearInterval(timerInterval);
+	  updateProgressBar(); // Ensure it finishes
+	  document.getElementById("progress-bar").style.width = "100%";
       showSummary();
     }
 
@@ -297,6 +320,7 @@
       answerEl.value = "";
       answerEl.className = "";
       answerEl.focus();
+      updateProgressBar();
     }
 
     function handleInput(event) {
