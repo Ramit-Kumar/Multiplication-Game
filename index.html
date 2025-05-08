@@ -67,6 +67,9 @@
       color: white;
       cursor: pointer;
       transition: background 0.3s, transform 0.2s;
+      flex: 1 1 150px;
+      max-width: 200px;
+      text-align: center;
     }
     .controls button:hover,
     .controls select:hover,
@@ -164,14 +167,14 @@
         font-size: 1.5rem;
       }
       .controls {
-        flex-direction: column;
-        align-items: center;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
       }
       .controls button,
       .controls select,
       .controls label {
         width: 100%;
-        text-align: center;
         max-width: 300px;
       }
     }
